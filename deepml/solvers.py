@@ -122,7 +122,7 @@ def adadelta(cost, params, grads=None, lr=1.0, rho=0.95, eps=1e-6, grad_norm=Non
 
     return updates
 
-def adadelta_g(grads, params, lr=1.0, rho=0.95, eps=1e-6, grad_norm=None):
+def adadelta_updates(grads, params, lr=1.0, rho=0.95, eps=1e-6, grad_norm=None):
     '''
     Adadelta solver.
     Reference: Matthew D. Zeiler, http://arxiv.org/abs/1212.5701

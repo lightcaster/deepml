@@ -5,16 +5,18 @@ from deepml.initializations import glorot_uniform, uniform
 from deepml.utils import shared_x
 
 class Dense(object):
-    def __init__(self, n_in, n_out):
+    def __init__(self, n_in, n_out, target):
         '''Dense layer functional representation'''
-        self.W = shared_x(glorot_uniform(shape=(n_in, n_out)))
-        self.b = shared_x(np.zeros(n_out))
+        self.W = shared_x(glorot_uniform(shape=(n_in, n_out)), 
+            target=target)
+        self.b = shared_x(np.zeros(n_out), target=target)
 
         self.params = [self.W, self.b]
 
     def apply(self, x):
-        return T.dot(x, self.W) + self.b
+        return x.dot(self.W) + self.b[None,:]
 
+"""
 class StackedDense(object):
     def __init__(self, n_in, n_stack, n_out, is_batched=False):
         '''Dense layer functional representation'''
@@ -33,7 +35,7 @@ class StackedDense(object):
             o = o.dimshuffle(1,0,2) + self.b
 
         return o
-
+"""
 
 class TimeDistributedDense(object):
 

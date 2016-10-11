@@ -1,20 +1,26 @@
 import numpy as np
 import theano
 import theano.tensor as T
-from theano.tensor.signal import downsample
+#from theano.tensor.signal import downsample
 from deepml.initializations import glorot_uniform
 
 floatX = theano.config.floatX
 
 class Conv2D(object):
 
-    def __init__(self, n_filters, stack_size, n_rows, n_cols):
+    def __init__(self, n_filters, stack_size, n_rows, n_cols, target=None):
 
-        W = glorot_uniform(shape=(n_filters, stack_size, n_rows, n_cols)).astype(floatX)
+        W = glorot_uniform(
+            shape=(n_filters, stack_size, n_rows, n_cols)).astype(floatX)
         b = np.zeros((n_filters,)).astype(floatX)
 
-        self.W = theano.shared(W)
-        self.b = theano.shared(b)
+        if target:
+            self.W = theano.shared(W, target=target)
+            self.b = theano.shared(b, target=target)
+        else:
+            self.W = theano.shared(W)
+            self.b = theano.shared(b)
+
         self.params = [self.W, self.b]
 
     def apply(self, x, border_mode='valid', subsample=(1,1)):
@@ -28,20 +34,6 @@ class Conv2D(object):
         ) + self.b.dimshuffle('x',0,'x','x')
 
         return output
-
-def max_pool_2d(x, poolsize=(2,2), ignore_border=True):
-
-    output = downsample.max_pool_2d(x, poolsize, ignore_border=ignore_border)
-
-    return output
-
-def unpool_2d(x, poolsize=(2,2)):
-
-    output = x.repeat(
-        poolsize[0], axis = 2).repeat(
-        poolsize[1], axis = 3)
-
-    return output
 
 def whiten_2d(x, W, m):
 
@@ -65,3 +57,4 @@ def batch_norm(x, eps=1e-3):
     xn = (x - m) / T.sqrt(v + eps)
 
     return xn 
+
